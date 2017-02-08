@@ -1,3 +1,7 @@
+## Specific to this repo
+student_list.csv
+## End of repo unique changes
+
 *.gem
 *.rbc
 /.config

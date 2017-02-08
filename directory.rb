@@ -14,6 +14,8 @@
 #   {name: "Norman Bates", cohort: :november}
 # ]
 
+require 'csv'
+
 SCREENWIDTH = 79
 DEFAULT_COHORT = :november
 
@@ -72,11 +74,20 @@ def print_students
   end
 end
 
+def save_list
+  CSV.open("./student_list.csv", "wb") do |csv_file|
+    @students.each do |student|
+      csv_file << [student[:name], student[:cohort]]
+    end
+  end
+end
+
 def show_menu
   puts 'What would you like to do:'
   puts '1) Add students'
   puts '2) Change the default cohort'
   puts '3) Show the students'
+  puts '4) Save the student list'
   puts 'q) Quit'
 end
 
@@ -90,6 +101,8 @@ def act_on choice
     print_header
     print_students
     print_footer(@students)
+  when '4'
+    save_list
   end
 end
 
