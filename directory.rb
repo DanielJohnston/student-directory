@@ -74,8 +74,26 @@ def print students
   end
 end
 
-default_cohort = input_cohort
-students = input_students default_cohort
-print_header
-print(students)
-print_footer(students)
+
+# control loop
+default_cohort = DEFAULT_COHORT
+students = []
+choice = ""
+until choice == "q"
+  puts 'What would you like to do:'
+  puts '1) Add students'
+  puts '2) Change the default cohort'
+  puts '3) Show the students'
+  puts 'q) Quit'
+  choice = gets.chomp
+  case choice
+  when '1'
+    students.concat input_students(default_cohort)
+  when '2'
+    default_cohort = input_cohort
+  when '3'
+    print_header
+    print(students)
+    print_footer(students)
+  end
+end
