@@ -66,6 +66,7 @@ def print_students
 end
 
 def save_list
+  @save_file = gets_default 'Choose a filename to save', @save_file
   CSV.open(@save_file, "wb") do |csv_file|
     @students.each do |student|
       csv_file << [student[:name], student[:cohort]]
@@ -74,6 +75,7 @@ def save_list
 end
 
 def load_list
+  @save_file = gets_default 'Choose a file to load', @save_file
   if File.exists?(@save_file)
     @students = []
     CSV.foreach(@save_file) do |row|
