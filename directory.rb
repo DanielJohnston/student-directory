@@ -18,33 +18,31 @@ SCREENWIDTH = 79
 DEFAULT_COHORT = :november
 
 def input_cohort
-  puts "Enter a default cohort (current default is #{DEFAULT_COHORT}):"
+  puts "Enter a default cohort (current default is #{@default_cohort}):"
   cohort = gets.chomp
-  if cohort == ""
-    DEFAULT_COHORT
-  else
-    cohort.to_sym
+  if cohort != ""
+    @default_cohort = cohort.to_sym
   end
 end
 
-def input_students default_cohort
+def input_students
   puts "Please enter the names of students."
   puts "Double enter to finish entry"
-  students = []
+  new_students = []
   name = gets.chomp
   while !name.empty? do
-    puts "And the cohort (default: #{default_cohort})"
+    puts "And the cohort (default: #{@default_cohort})"
     entered_cohort = gets.chomp
     if entered_cohort == ""
-      cohort = default_cohort
+      cohort = @default_cohort
     else
       cohort = entered_cohort.to_sym
     end
-    students << {name: name, cohort: cohort}
-    puts "We have #{students.count} students."
+    new_students << {name: name, cohort: cohort}
+    puts "We have #{new_students.count} new students."
     name = gets.chomp
   end
-  students
+  new_students
 end
 
 def print_header
@@ -57,43 +55,50 @@ def print_footer names
   puts "Overall, we have #{ names.length } great student#{ 's' if names.length != 1 }"
 end
 
-def all_cohorts students
-  students.map{ |student| student[:cohort] }.uniq
+def all_cohorts
+  @students.map{ |student| student[:cohort] }.uniq
 end
 
-def print students
-  if students.count == 0
-    puts 'There are no students enrolled!'
+def print_students
+  if @students.count == 0
+    puts 'There are no @students enrolled!'
     return
   end
-  all_cohorts(students).each do |cohort|
+  all_cohorts.each do |cohort|
     puts "Cohort: #{ cohort }".center(SCREENWIDTH)
-    students.select { |student| student[:cohort] == cohort }.each_with_index do |student, index|
+    @students.select { |student| student[:cohort] == cohort }.each_with_index do |student, index|
       puts "#{index+1}. #{student[:name]} (#{student[:cohort]} cohort)"
     end
   end
 end
 
-
-# control loop
-default_cohort = DEFAULT_COHORT
-students = []
-choice = ""
-until choice == "q"
+def show_menu
   puts 'What would you like to do:'
   puts '1) Add students'
   puts '2) Change the default cohort'
   puts '3) Show the students'
   puts 'q) Quit'
-  choice = gets.chomp
+end
+
+def act_on choice
   case choice
   when '1'
-    students.concat input_students(default_cohort)
+    @students.concat input_students
   when '2'
-    default_cohort = input_cohort
+    @default_cohort = input_cohort
   when '3'
     print_header
-    print(students)
-    print_footer(students)
+    print_students
+    print_footer(@students)
   end
+end
+
+# control loop
+@default_cohort = DEFAULT_COHORT
+@students = []
+choice = ""
+until choice == "q"
+  show_menu
+  choice = gets.chomp
+  act_on choice
 end
