@@ -18,6 +18,7 @@ require 'csv'
 
 SCREENWIDTH = 79
 DEFAULT_COHORT = :november
+SAVE_FILE = "./student_list.csv"
 
 def input_cohort
   puts "Enter a default cohort (current default is #{@default_cohort}):"
@@ -75,11 +76,21 @@ def print_students
 end
 
 def save_list
-  CSV.open("./student_list.csv", "wb") do |csv_file|
+  CSV.open(SAVE_FILE, "wb") do |csv_file|
     @students.each do |student|
       csv_file << [student[:name], student[:cohort]]
     end
   end
+end
+
+def load_list
+  @students = []
+  CSV.foreach(SAVE_FILE) do |row|
+    @students << {name: row[0], cohort: row[1].to_sym}
+  end
+  # csv_file.each do |student_line|
+  #   puts student_line
+  # end
 end
 
 def show_menu
@@ -88,6 +99,7 @@ def show_menu
   puts '2) Change the default cohort'
   puts '3) Show the students'
   puts '4) Save the student list'
+  puts '5) Load the student list'
   puts 'q) Quit'
 end
 
@@ -103,6 +115,8 @@ def act_on choice
     print_footer(@students)
   when '4'
     save_list
+  when '5'
+    load_list
   end
 end
 
