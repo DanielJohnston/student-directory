@@ -18,32 +18,22 @@ require 'csv'
 
 SCREENWIDTH = 79
 DEFAULT_COHORT = :november
-SAVE_FILE = "./student_list.csv"
+DEFAULT_SAVE_FILE = "./student_list.csv"
 
 def input_cohort
-  puts "Enter a default cohort (current default is #{@default_cohort}):"
-  cohort = gets.chomp
-  if cohort != ""
-    @default_cohort = cohort.to_sym
-  end
+  @default_cohort = (gets_default 'Enter a default cohort', @default_cohort).to_sym
 end
 
 def input_students
   puts "Please enter the names of students."
   puts "Double enter to finish entry"
   new_students = []
-  name = gets.chomp
+  name = STDIN.gets.chomp
   while !name.empty? do
-    puts "And the cohort (default: #{@default_cohort})"
-    entered_cohort = gets.chomp
-    if entered_cohort == ""
-      cohort = @default_cohort
-    else
-      cohort = entered_cohort.to_sym
-    end
+    cohort = (gets_default 'Which cohort', @default_cohort).to_sym
     new_students << {name: name, cohort: cohort}
     puts "We have #{new_students.count} new students."
-    name = gets.chomp
+    name = STDIN.gets.chomp
   end
   new_students
 end
@@ -64,7 +54,7 @@ end
 
 def print_students
   if @students.count == 0
-    puts 'There are no @students enrolled!'
+    puts 'There are no students enrolled!'
     return
   end
   all_cohorts.each do |cohort|
@@ -76,7 +66,7 @@ def print_students
 end
 
 def save_list
-  CSV.open(SAVE_FILE, "wb") do |csv_file|
+  CSV.open(@save_file, "wb") do |csv_file|
     @students.each do |student|
       csv_file << [student[:name], student[:cohort]]
     end
@@ -84,13 +74,25 @@ def save_list
 end
 
 def load_list
-  @students = []
-  CSV.foreach(SAVE_FILE) do |row|
-    @students << {name: row[0], cohort: row[1].to_sym}
+  if File.exists?(@save_file)
+    @students = []
+    CSV.foreach(@save_file) do |row|
+      @students << {name: row[0], cohort: row[1].to_sym}
+    end
   end
   # csv_file.each do |student_line|
   #   puts student_line
   # end
+end
+
+def gets_default question, default
+  puts "#{question} (default: #{default})"
+  response = STDIN.gets.chomp
+  if response == ""
+    default
+  else
+    response
+  end
 end
 
 def show_menu
@@ -121,11 +123,14 @@ def act_on choice
 end
 
 # control loop
-@default_cohort = DEFAULT_COHORT
 @students = []
+@save_file = DEFAULT_SAVE_FILE
+@save_file = ARGV[0] if !ARGV[0].nil?
+@default_cohort = DEFAULT_COHORT
+load_list
 choice = ""
 until choice == "q"
   show_menu
-  choice = gets.chomp
+  choice = STDIN.gets.chomp
   act_on choice
 end
