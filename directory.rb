@@ -54,12 +54,23 @@ end
 
 def print_footer names
   # finally, we print the total number of students
-  puts "Overall, we have #{names.length} great student#{'s' if names.length > 1}"
+  puts "Overall, we have #{ names.length } great student#{ 's' if names.length != 1 }"
+end
+
+def all_cohorts students
+  students.map{ |student| student[:cohort] }.uniq
 end
 
 def print students
-  students.each_with_index do |student, index|
-    puts "#{index+1}. #{student[:name]} (#{student[:cohort]} cohort)"
+  if students.count == 0
+    puts 'There are no students enrolled!'
+    return
+  end
+  all_cohorts(students).each do |cohort|
+    puts "Cohort: #{ cohort }".center(SCREENWIDTH)
+    students.select { |student| student[:cohort] == cohort }.each_with_index do |student, index|
+      puts "#{index+1}. #{student[:name]} (#{student[:cohort]} cohort)"
+    end
   end
 end
 
